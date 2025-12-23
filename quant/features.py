@@ -28,12 +28,8 @@ def make_features_and_labels(
     # (date, symbol, feature) → long
     X_list = []
     for name, df in features.items():
-        x = (
-            df.stack()
-            .rename(name)
-            .reset_index()
-            .rename(columns={"level_0": "date", "level_1": "symbol"})
-        )
+        x = df.stack().rename(name).reset_index()
+        x.columns = ["date", "symbol", name]
         X_list.append(x)
 
     X_long = X_list[0]
@@ -43,6 +39,7 @@ def make_features_and_labels(
     # ===== label =====
     y = px.shift(-label_horizon) / px - 1.0
     y_long = y.stack().rename("y").reset_index()
+    y_long.columns = ["date", "symbol", "y"]
 
     data = X_long.merge(y_long, on=["date", "symbol"], how="inner")
 
