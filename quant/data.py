@@ -2,6 +2,7 @@ from __future__ import annotations
 from pathlib import Path
 import pandas as pd
 
+
 def load_prices_csv_panel(data_dir: Path) -> pd.DataFrame:
     """
     Expect files like:
@@ -26,12 +27,16 @@ def load_prices_csv_panel(data_dir: Path) -> pd.DataFrame:
     prices = pd.concat(frames, axis=1).sort_index().ffill()
     return prices
 
+
 def load_prices_yfinance(universe, start: str, end: str) -> pd.DataFrame:
     import yfinance as yf
-    df = yf.download(list(universe), start=start, end=end, auto_adjust=True, progress=False)
+
+    df = yf.download(
+        list(universe), start=start, end=end, auto_adjust=True, progress=False
+    )
     # yfinance returns columns like ('Close', 'SPY') etc
     if isinstance(df.columns, pd.MultiIndex):
-        if ("Close" in df.columns.get_level_values(0)):
+        if "Close" in df.columns.get_level_values(0):
             px = df["Close"].copy()
         else:
             # auto_adjust True usually returns 'Close'

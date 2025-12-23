@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List
 
+
 @dataclass(frozen=True)
 class BacktestConfig:
     # Universe
@@ -16,8 +17,8 @@ class BacktestConfig:
     min_history: int = 60
 
     # Walk-forward
-    train_window: int = 252 * 2      # 2y rolling training
-    retrain_freq: int = 21           # monthly retrain
+    train_window: int = 252 * 2  # 2y rolling training
+    retrain_freq: int = 21  # monthly retrain
 
     # Model
     model_name: str = "ridge"

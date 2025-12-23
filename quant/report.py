@@ -3,13 +3,14 @@ from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
 def make_report(
     out_dir: Path,
     equity_curve: pd.Series,
     daily_pnl: pd.Series,
     turnover: pd.Series,
     weights: pd.DataFrame,
-    summary: pd.Series
+    summary: pd.Series,
 ):
     # Save summary
     summary.to_csv(out_dir / "summary.csv", header=True)

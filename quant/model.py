@@ -5,6 +5,7 @@ from sklearn.linear_model import Ridge
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
+
 def walkforward_train_predict(
     X: pd.DataFrame,
     y: pd.Series,
@@ -12,7 +13,7 @@ def walkforward_train_predict(
     train_window: int,
     retrain_freq: int,
     model_name: str = "ridge",
-    alpha: float = 10.0
+    alpha: float = 10.0,
 ) -> pd.Series:
     """
     Walk-forward training on dates. For each date t, train on (t-train_window ... t-1),
@@ -24,8 +25,12 @@ def walkforward_train_predict(
 
     # model
     if model_name == "ridge":
-        mdl = Pipeline([("scaler", StandardScaler(with_mean=True, with_std=True)),
-                        ("ridge", Ridge(alpha=alpha, random_state=42))])
+        mdl = Pipeline(
+            [
+                ("scaler", StandardScaler(with_mean=True, with_std=True)),
+                ("ridge", Ridge(alpha=alpha, random_state=42)),
+            ]
+        )
     else:
         raise ValueError(f"Unsupported model {model_name}")
 
@@ -38,7 +43,7 @@ def walkforward_train_predict(
 
         # Retrain schedule
         if (last_fit_i is None) or ((i - last_fit_i) >= retrain_freq):
-            train_dates = dates[i - train_window:i]
+            train_dates = dates[i - train_window : i]
             tr_idx = X.index.get_level_values(0).isin(train_dates)
             X_tr = X.loc[tr_idx]
             y_tr = y.loc[tr_idx]

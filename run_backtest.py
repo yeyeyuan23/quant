@@ -10,9 +10,10 @@ from quant.backtest import run_backtest
 from quant.metrics import summarize_performance
 from quant.report import make_report
 
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mode", choices=["csv", "yfinance"], default="csv")
+    ap.add_argument("--mode", choices=["csv", "yfinance"], default="yfinance")
     ap.add_argument("--data_dir", type=str, default="./data")
     ap.add_argument("--out_dir", type=str, default="./out")
     args = ap.parse_args()
@@ -33,16 +34,18 @@ def main():
         prices=prices,
         lookback=cfg.lookback,
         label_horizon=cfg.label_horizon,
-        min_history=cfg.min_history
+        min_history=cfg.min_history,
     )
 
     # 3) Walk-forward train + predict scores
     scores = walkforward_train_predict(
-        X=X, y=y, meta=meta,
+        X=X,
+        y=y,
+        meta=meta,
         train_window=cfg.train_window,
         retrain_freq=cfg.retrain_freq,
         model_name=cfg.model_name,
-        alpha=cfg.ridge_alpha
+        alpha=cfg.ridge_alpha,
     )
 
     # 4) Portfolio construction
@@ -51,7 +54,7 @@ def main():
         long_frac=cfg.long_frac,
         short_frac=cfg.short_frac,
         gross_leverage=cfg.gross_leverage,
-        dollar_neutral=cfg.dollar_neutral
+        dollar_neutral=cfg.dollar_neutral,
     )
 
     # 5) Backtest with costs
@@ -59,7 +62,7 @@ def main():
         prices=prices,
         weights=weights,
         commission_bps=cfg.commission_bps,
-        slippage_bps=cfg.slippage_bps
+        slippage_bps=cfg.slippage_bps,
     )
 
     # 6) Metrics + report
@@ -72,8 +75,9 @@ def main():
         daily_pnl=bt["daily_pnl"],
         turnover=bt["turnover"],
         weights=weights,
-        summary=summary
+        summary=summary,
     )
+
 
 if __name__ == "__main__":
     main()

@@ -2,12 +2,13 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+
 def build_portfolio_from_scores(
     scores: pd.Series,
     long_frac: float = 0.2,
     short_frac: float = 0.2,
     gross_leverage: float = 1.0,
-    dollar_neutral: bool = True
+    dollar_neutral: bool = True,
 ) -> pd.DataFrame:
     """
     Rank-based long/short portfolio per date.
@@ -31,7 +32,7 @@ def build_portfolio_from_scores(
 
         w = pd.Series(0.0, index=g["symbol"].values)
         if kL > 0:
-            w.loc[long_syms] =  0.5 * gross_leverage / kL
+            w.loc[long_syms] = 0.5 * gross_leverage / kL
         if kS > 0:
             w.loc[short_syms] = -0.5 * gross_leverage / kS
 
