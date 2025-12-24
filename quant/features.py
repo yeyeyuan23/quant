@@ -8,12 +8,17 @@ def make_features_and_labels(
     label_horizon: int = 1,
     min_history: int = 60,
 ):
+    # 对价格矩阵按日期排序并前向填充
     px = prices.sort_index().ffill()
+    # 计算收益率
     rets = px.pct_change()
 
     # ===== features =====
+    # 动量
     mom = px / px.shift(lookback) - 1.0
+    # 短期反转
     mr = -(px / px.shift(5) - 1.0)
+    # 波动率
     vol = rets.rolling(lookback).std()
 
     def zscore_cs(df):
@@ -25,7 +30,7 @@ def make_features_and_labels(
         "vol": zscore_cs(vol),
     }
 
-    # (date, symbol, feature) → long
+    # 宽表转长表 (date, symbol, feature) → long
     X_list = []
     for name, df in features.items():
         x = df.stack().rename(name).reset_index()
@@ -37,7 +42,7 @@ def make_features_and_labels(
         X_long = X_long.merge(x, on=["date", "symbol"])
 
     # ===== label =====
-    y = px.shift(-label_horizon) / px - 1.0
+    y = px.shift(-label_horizon) / px - 1.0  # t+1收益率
     y_long = y.stack().rename("y").reset_index()
     y_long.columns = ["date", "symbol", "y"]
 
@@ -51,6 +56,7 @@ def make_features_and_labels(
     X = data.set_index(["date", "symbol"])[list(features.keys())]
     y = data.set_index(["date", "symbol"])["y"]
 
+    # 训练/预测用到的日期列表
     meta = {"dates": sorted(X.index.get_level_values(0).unique())}
 
     return X, y, meta
