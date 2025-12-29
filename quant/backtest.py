@@ -20,6 +20,14 @@ def run_backtest(
     # align dates
     W = weights.reindex(px.index).ffill().fillna(0.0)
 
+    # trim warmup period with no active positions
+    active = W.abs().sum(axis=1) > 0
+    if active.any():
+        start_date = active.idxmax()
+        px = px.loc[start_date:]
+        rets = rets.loc[start_date:]
+        W = W.loc[start_date:]
+
     # turnover
     dW = W.diff().abs()
     turnover = dW.sum(axis=1).fillna(0.0)

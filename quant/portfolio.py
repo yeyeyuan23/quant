@@ -32,22 +32,33 @@ def build_portfolio_from_scores(
 
         w = pd.Series(0.0, index=g["symbol"].values)
         if kL > 0:
-            w.loc[long_syms] = 0.5 * gross_leverage / kL
+            long_scores = g.set_index("symbol").loc[long_syms, "score"].clip(lower=0.0)
+            if long_scores.sum() <= 0:
+                long_scores = pd.Series(1.0, index=long_scores.index)
+            w.loc[long_syms] = long_scores / long_scores.sum() * 0.5 * gross_leverage
         if kS > 0:
-            w.loc[short_syms] = -0.5 * gross_leverage / kS
+            short_scores = (
+                -g.set_index("symbol").loc[short_syms, "score"].clip(upper=0.0)
+            )
+            if short_scores.sum() > 0:
+                w.loc[short_syms] = (
+                    -short_scores / short_scores.sum() * 0.5 * gross_leverage
+                )
 
         if not dollar_neutral:
-            # rescale to gross leverage only
             gross = w.abs().sum()
             if gross > 0:
                 w = w / gross * gross_leverage
-        else:
-            # ensure exact neutrality (small numerical fix)
-            w = w - w.mean()
-
-            gross = w.abs().sum()
-            if gross > 0:
-                w = w / gross * gross_leverage
+        elif w.abs().sum() > 0:
+            if (w < 0).sum() == 0:
+                gross = w.abs().sum()
+                if gross > 0:
+                    w = w / gross * gross_leverage
+            else:
+                w = w - w.mean()
+                gross = w.abs().sum()
+                if gross > 0:
+                    w = w / gross * gross_leverage
 
         w.name = d
         weights.append(w)

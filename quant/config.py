@@ -17,7 +17,7 @@ class BacktestConfig:
     min_history: int = 60
 
     # Walk-forward
-    train_window: int = 252 * 2  # 2y rolling training
+    train_window: int = 252  # 1y rolling training
     retrain_freq: int = 21  # monthly retrain
 
     # Model
@@ -25,10 +25,10 @@ class BacktestConfig:
     ridge_alpha: float = 10.0
 
     # Portfolio
-    long_frac: float = 0.2
-    short_frac: float = 0.2
+    long_frac: float = 0.2  # 20% of the portfolio in long positions
+    short_frac: float = 0.2  # 20% of the portfolio in short positions
     gross_leverage: float = 1.0
-    dollar_neutral: bool = True
+    dollar_neutral: bool = True  # 是否强制净敞口为0，即多头和空头市值相等
 
     # Costs
     commission_bps: float = 0.5
