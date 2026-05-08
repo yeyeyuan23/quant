@@ -11,9 +11,12 @@ def make_report(
     turnover: pd.Series,
     weights: pd.DataFrame,
     summary: pd.Series,
+    benchmark_summary: pd.DataFrame | None = None,
 ):
     # Save summary
     summary.to_csv(out_dir / "summary.csv", header=True)
+    if benchmark_summary is not None:
+        benchmark_summary.to_csv(out_dir / "benchmark_summary.csv")
 
     # Equity curve plot
     plt.figure()

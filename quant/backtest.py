@@ -10,7 +10,7 @@ def run_backtest(
 ):
     """
     Daily close-to-close backtest.
-    PnL(t) = sum_i w_{t-1,i} * r_{t,i} - cost(turnover)
+    PnL(t) = sum_i w_{t-1,i} * r_{t,i} - cost(turnover_t)
     turnover = sum_i |w_t - w_{t-1}|
     costs in bps applied to turnover.
     """
@@ -31,13 +31,12 @@ def run_backtest(
     # turnover
     dW = W.diff().abs()
     turnover = dW.sum(axis=1).fillna(0.0)
-    # align trading costs with the weights used for the return (t-1 -> t)
-    turnover_for_costs = turnover.shift(1).fillna(0.0)
 
     cost_rate = (commission_bps + slippage_bps) / 10000.0
-    costs = turnover_for_costs * cost_rate
+    costs = turnover * cost_rate
 
-    # use yesterday weights for today's return
+    # Use yesterday's close weights for today's close-to-close return, then
+    # deduct the cost of rebalancing into today's close weights.
     pnl_gross = (W.shift(1).fillna(0.0) * rets).sum(axis=1)
     daily_pnl = pnl_gross - costs
 

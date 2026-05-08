@@ -13,8 +13,8 @@ class BacktestConfig:
 
     # Feature/label
     lookback: int = 20
-    label_horizon: int = 1
-    min_history: int = 60
+    label_horizon: int = 5
+    min_history: int = 126
 
     # Walk-forward
     train_window: int = 252  # 1y rolling training
@@ -25,10 +25,13 @@ class BacktestConfig:
     ridge_alpha: float = 10.0
 
     # Portfolio
-    long_frac: float = 0.2  # 20% of the portfolio in long positions
-    short_frac: float = 0.2  # 20% of the portfolio in short positions
+    portfolio_mode: str = "long_short"
+    long_frac: float = 0.50
+    short_frac: float = 0.17
     gross_leverage: float = 1.0
-    dollar_neutral: bool = True  # 是否强制净敞口为0，即多头和空头市值相等
+    net_exposure: float = 0.80
+    dollar_neutral: bool = False
+    rebalance_freq: int = 21  # trading days between portfolio rebalances
 
     # Costs
     commission_bps: float = 0.5
